@@ -1,18 +1,34 @@
 import streamlit as st
-import requests
+import random
 
-# Replace this with your Render public backend URL
-API_URL = "https://my-flask-backend.onrender.com/quote"
+# Initialize quotes (acts like backend)
+if "quotes" not in st.session_state:
+    st.session_state.quotes = [
+        "The best way to predict the future is to invent it.",
+        "Life is what happens when you're busy making other plans.",
+        "You miss 100% of the shots you don’t take.",
+        "In the middle of every difficulty lies opportunity.",
+        "Do one thing every day that scares you."
+    ]
 
-st.title("Random Quote Microservice Frontend")
+# Streamlit Frontend
+st.title("Random Quote Microservice")
 
-if st.button("Get a Random Quote"):
-    try:
-        response = requests.get(API_URL)
-        if response.status_code == 200:
-            data = response.json()
-            st.success(data["quote"])
+# Sidebar for actions
+action = st.sidebar.radio("Choose Action", ["Get Quote", "Add Quote"])
+
+# Get Random Quote
+if action == "Get Quote":
+    if st.button("Get Random Quote"):
+        quote = random.choice(st.session_state.quotes)
+        st.success(quote)
+
+# Add a New Quote
+elif action == "Add Quote":
+    new_quote = st.text_input("Enter a new quote")
+    if st.button("Add Quote"):
+        if new_quote.strip() == "":
+            st.error("Quote cannot be empty!")
         else:
-            st.error("Failed to fetch quote from backend")
-    except Exception as e:
-        st.error(f"Error: {e}")
+            st.session_state.quotes.append(new_quote.strip())
+            st.success("Quote added successfully!")
